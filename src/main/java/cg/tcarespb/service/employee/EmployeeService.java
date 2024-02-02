@@ -17,9 +17,11 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +44,8 @@ public class EmployeeService {
     private final PhotoRepository photoRepository;
     private final UserRepository userRepository;
     private final RateRepository rateRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
+
 
 
     public Page<EmployeeListResponse> getEmployeeList(EStatus status, Pageable pageable) {
@@ -239,6 +243,12 @@ public class EmployeeService {
     public void updatePhotoEmployee(EmployeeAvatarSaveRequest request, String employeeId) {
         Employee employee = findById(employeeId);
         Photo image = photoRepository.findPhotoById(request.getAvatar()).get();
+        if (employee.getPhoto()==null){
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setMessage("Sent to Admin");
+            chatMessage.setTimeStamp(new Date());
+            messagingTemplate.convertAndSend("/topic/admin", chatMessage);
+        }
         employee.setPhoto(image);
         employee.setStatus(EStatus.WAITING);
 //        employee.setDescriptionAboutMySelf(request.getDescriptionAboutMySelf());

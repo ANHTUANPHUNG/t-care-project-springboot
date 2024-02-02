@@ -95,6 +95,10 @@ public class AdminRestController {
     @PutMapping("/employees/active/{idEmployee}")
     public ResponseEntity<?> active(@PathVariable("idEmployee") String idEmployee) {
         adminService.activeEmployee(idEmployee);
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setMessage("Sent to user");
+        chatMessage.setTimeStamp(new Date());
+        messagingTemplate.convertAndSend("/topic/user/profile", chatMessage);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
