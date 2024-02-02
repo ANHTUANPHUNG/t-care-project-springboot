@@ -64,6 +64,6 @@ public interface ContractRepository extends JpaRepository<Contract,String> {
             "c.totalAmount," +
             "c.amount," +
             "c.feeAmount," +
-            "c.gender)  FROM Contract c")
+            "c.gender)  FROM Contract c ORDER BY c.createAt DESC")
     Page<ContractResponse> findAllContract(Pageable pageable);
 }
